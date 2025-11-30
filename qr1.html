@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culrav QR Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        input {
+            padding: 15px 20px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 4px 20px rgba(0, 234, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: #00eaff;
+            color: #141e30;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: #00d5e6;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .download-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: #45a049;
+        }
+
+        .reset-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #ff5252;
+        }
+
+        #qrContainer {
+            margin: 30px auto;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .qr-code {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        #finalQR {
+            width: 100%;
+            border-radius: 15px;
+            background: white;
+            padding: 15px;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 15px;
+            font-weight: 600;
+            display: none;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .success-message {
+            color: #4CAF50;
+            margin-top: 15px;
+            font-weight: 600;
+            display: none;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .input-section {
+                padding: 20px;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Culrav QR Generator</h1>
+            <p class="subtitle">Create custom QR codes with your logo and branding</p>
+        </header>
+        
+        <section class="input-section">
+            <div class="input-group">
+                <input type="text" id="linkInput" placeholder="Enter your link here (e.g., https://example.com)">
+                
+                <div class="buttons">
+                    <button onclick="generateQR()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M2 2h2v2H2V2Z"/>
+                            <path d="M6 0v6H0V0h6ZM5 1H1v4h4V1ZM4 12H2v2h2v-2Z"/>
+                            <path d="M6 10v6H0v-6h6Zm-5 1v4h4v-4H1Zm11-9h2v2h-2V2Z"/>
+                            <path d="M10 0v6h6V0h-6Zm5 1v4h-4V1h4ZM8 1V0h1v2H8v2H7V1h1Zm0 5V4h1v2H8ZM6 8V7h1V6h1v2h1V7h5v1h-4v1H7V8H6Zm0 0v1H2V8H1v1H0V7h3v1h3Zm10 1h-1V7h1v2Zm-1 0h-1v2h2v-1h-1V9Zm-4 0h2v1h-1v1h-1V9Zm2 3v-1h-1v1h-1v1H9v1h3v-2h1Zm0 0h3v1h-2v1h-1v-2Zm-4 0v3h1v-1h1v-1h1v-1H7Zm1 0h1v1h-1V9Zm2 4v2h-2v-1h1v-1h1Z"/>
+                            <path d="M7 12h1v3h4v1H7v-4Zm9 2v2h-3v-1h2v-1h1Z"/>
+                        </svg>
+                        Generate QR Code
+                    </button>
+                    <button class="download-btn" onclick="downloadQR()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                        </svg>
+                        Download QR Code
+                    </button>
+                    <button class="reset-btn" onclick="resetQR()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                        Reset
+                    </button>
+                </div>
+                
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+            </div>
+        </section>
+        
+        <section id="qrContainer">
+            <div class="qr-code">
+                <canvas id="finalQR" width="350" height="350"></canvas>
+            </div>
+            <p class="instructions">Scan this QR code with any QR scanner app</p>
+        </section>
+        
+        <footer>
+            <p>Made with love by Avinaba S | Culrav QR Generator</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    
+    <script>
+        let logoLoaded = false;
+        const logoImg = new Image();
+        logoImg.crossOrigin = "anonymous";
+        logoImg.src = "https://i.ibb.co/sJktsDyv/IMG-5880.png";
+        
+        logoImg.onload = function() {
+            logoLoaded = true;
+            console.log("Logo loaded successfully");
+        };
+        
+        logoImg.onerror = function() {
+            console.error("Failed to load logo");
+        };
+
+        function generateQR() {
+            const link = document.getElementById("linkInput").value.trim();
+            const errorMessage = document.getElementById("errorMessage");
+            const successMessage = document.getElementById("successMessage");
+            const qrContainer = document.getElementById("qrContainer");
+            
+            // Reset messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Validate input
+            if (!link) {
+                errorMessage.textContent = "Please enter a link first!";
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Validate URL format
+            try {
+                new URL(link);
+            } catch (e) {
+                errorMessage.textContent = "Please enter a valid URL (e.g., https://example.com)";
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Show QR container
+            qrContainer.style.display = 'block';
+            
+            // Create QR code directly on the final canvas
+            const finalCanvas = document.getElementById("finalQR");
+            const qr = new QRious({
+                element: finalCanvas,
+                value: link,
+                size: 350,
+                level: 'H', // High error correction
+                padding: 25
+            });
+            
+            // Add branding to the QR code
+            addBranding(finalCanvas);
+            
+            // Show success message
+            successMessage.textContent = "QR code generated successfully!";
+            successMessage.style.display = 'block';
+            
+            // Scroll to QR code
+            qrContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function addBranding(canvas) {
+            const ctx = canvas.getContext("2d");
+            
+            // Create a white area in the center for the logo
+            const centerSize = 90; // Increased size for better clarity
+            const centerX = (canvas.width - centerSize) / 2;
+            const centerY = (canvas.height - centerSize) / 2;
+            
+            // Draw white background for logo
+            ctx.fillStyle = "white";
+            ctx.fillRect(centerX, centerY, centerSize, centerSize);
+            
+            // Draw the logo in the center if it's loaded
+            if (logoLoaded) {
+                const logoSize = 80; // Increased logo size
+                const logoX = centerX + (centerSize - logoSize) / 2;
+                const logoY = centerY + (centerSize - logoSize) / 2;
+                
+                // Use image smoothing for better quality
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                
+                ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+            } else {
+                // Fallback: Draw placeholder text if logo fails to load
+                ctx.font = "bold 14px Poppins";
+                ctx.fillStyle = "#141e30";
+                ctx.textAlign = "center";
+                ctx.fillText("CULRAV", canvas.width / 2, canvas.height / 2 + 5);
+            }
+            
+            // Draw Culrav text below the QR code
+            ctx.font = "bold 18px Poppins";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("CULRAV", canvas.width / 2, canvas.height + 25);
+        }
+        
+        function downloadQR() {
+            const canvas = document.getElementById("finalQR");
+            const link = document.createElement("a");
+            link.download = "culrav-qr-code.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        }
+        
+        function resetQR() {
+            document.getElementById("linkInput").value = '';
+            document.getElementById("qrContainer").style.display = 'none';
+            document.getElementById("errorMessage").style.display = 'none';
+            document.getElementById("successMessage").style.display = 'none';
+            
+            const canvas = document.getElementById("finalQR");
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Allow Enter key to generate QR code
+        document.getElementById("linkInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                generateQR();
+            }
+        });
+    </script>
+</body>
+</html>
